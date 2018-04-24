@@ -1,0 +1,40 @@
+<form #userForm="ngForm" >
+  <table border=1>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Address</th>
+        <th colspan="2"></th>
+      </tr>
+      <tr>
+        <th>
+          <input name="Name" [(ngModel)]="Name" placeholder="Name" />
+        </th>
+        <th>
+          <input name="Age" [(ngModel)]="Age" placeholder="Age" />
+        </th>
+        <th>
+          <input name="Address" [(ngModel)]="Address" placeholder="Address" />
+        </th>
+        <th colspan="2">
+          <button (click)="postUserDetails(userForm.value)" *ngIf="showSave"> Save </button>
+          <button type="submit" *ngIf="showUpdate"> Update </button>
+          <button  (click)="CancelEdit()" *ngIf="showUpdate"> Cancel </button>
+        </th>
+
+      </tr>
+    </thead>
+    <tr *ngFor="let user of UserDetails">
+      <td> {{user.Name}}</td>
+      <td> {{user.Age}}</td>
+      <td> {{user.Address}}</td>
+      <td>
+        <button (click)="EditUser(user)">Edit</button>
+      </td>
+      <td>
+        <button (click)="DeleteUserDetails(user.Name)">Remove</button>
+      </td>
+    </tr>
+  </table>
+</form>

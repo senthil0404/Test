@@ -1,0 +1,41 @@
+<form #userForm="ngForm">
+  <table border=1>
+    <thead>
+      <tr>
+        <th>BetId</th>
+        <th>PlayerId</th>
+        <th>EventId</th>
+        <th colspan="2"></th>
+      </tr>
+      <tr>
+        <th>
+          <input name="BetId" [(ngModel)]="BetId" placeholder="BetId" />
+        </th>
+        <th>
+          <input name="PlayerId" [(ngModel)]="PlayerId" placeholder="PlayerId" />
+        </th>
+        <th>
+          <input name="EventId" [(ngModel)]="EventId" placeholder="Address" />
+        </th>
+        <th colspan="2">
+          <button (click)="postUserDetails(userForm.value)" *ngIf="showSave"> Save </button>
+          <button type="submit" *ngIf="showUpdate"> Update </button>
+          <button (click)="CancelEdit()" *ngIf="showUpdate"> Cancel </button>
+        </th>
+
+      </tr>
+    </thead>
+    {{JSON.stringify(UserDetails)}}
+    <tr *ngFor="let bet1 of UserDetails">
+      <td> {{bet1.BetId}}</td>
+      <td> {{bet1.PlayerId}}</td>
+      <td> {{bet1.EventId}}</td>
+      <td>
+        <button (click)="EditUser(bet1)">Edit</button>
+      </td>
+      <td>
+        <button (click)="DeleteUserDetails(bet1.BetId)">Remove</button>
+      </td>
+    </tr>
+  </table>
+</form>
