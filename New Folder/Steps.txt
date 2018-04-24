@@ -1,0 +1,181 @@
+npm install -g @angular/cli
+ng new angularcrud
+ng g c Bet
+ng g s BetService
+ng g m BetModel
+--------------------------Service---------
+
+import { Injectable } from '@angular/core'
+import { Http } from '@angular/http' //to use http get method   // Question 1
+import 'rxjs/add/operator/map'; //to use map method .The Map method helps to convert the data to json format // Question 2
+import { BetDetails } from '../Shared/bet-model.module';
+import { Observable } from 'rxjs/Observable';
+
+@Injectable()
+export class BetServiceService {
+  constructor(private http: Http) //to use http get method // Question 4
+  {
+  }
+  getUserDetailsService() {
+
+return this.http.get('http://localhost:56542/Api/Bet/Get')
+      .map(res => res.json());
+  }
+
+  PostuserDetailsService(BetDetail: BetDetails) {
+    this.http.post('http://localhost:56542/Api/Bet/Post', BetDetail).subscribe(status => console.log(JSON.stringify(status)));
+  }
+  UpdateuserDetailsService(BetDetail: BetDetails) {
+    this.http.put('http://localhost:56542/Api/Bet/get/Put', BetDetail).subscribe(status => console.log(JSON.stringify(status)));
+  }
+  DeleteuserDetailsService(BetId: number) {
+    this.http.delete('http://localhost:56542/Api/Bet/Delete?BetId=' + BetId).subscribe(status => console.log(JSON.stringify(status)));
+  }
+}
+
+
+----------------------------Component---------------
+
+import { Component, OnInit } from '@angular/core';
+
+import { BetServiceService } from './Shared/bet-service.service';
+import { BetDetails } from './Shared/bet-model.module';
+
+@Component({
+  selector: 'app-bet',
+  templateUrl: './bet.component.html',
+  styleUrls: ['./bet.component.css']
+})
+export class BetComponent implements OnInit {
+  UserDetails: BetDetails[];
+  BetId: string;
+  Age: number;
+  Address: string;
+  showSave: boolean = true;
+  showUpdate: boolean = false;
+  load: boolean = true;
+  constructor(private userServiceService: BetServiceService) {
+    if (this.load) {
+      this.getUserDetails();
+      this.load = false;
+    }
+  }
+
+  EditUser(UserDetail: BetDetails) {
+    //this.BetId = UserDetail.BetId;
+    //this.Age = Number(UserDetail.Age);
+    //this.Address = UserDetail.Address;
+    //this.showSave = false;
+    //this.showUpdate = true;
+  }
+  CancelEdit() {
+    //this.Name = '';
+    this.Age = null;
+    this.Address = '';
+    this.showSave = true;
+    this.showUpdate = false;
+  }
+
+  postUserDetails(UserDetail: BetDetails) {
+    this.userServiceService.PostuserDetailsService(UserDetail);
+    this.getUserDetails();
+  }
+  DeleteUserDetails(UserDetail: number) {
+    this.userServiceService.DeleteuserDetailsService(UserDetail);
+    this.getUserDetails();
+  }
+  getUserDetails() {
+    this.userServiceService.getUserDetailsService().subscribe(user => { this.UserDetails = user });
+  }
+  ngOnInit() {
+  }
+}
+---------------------html---------------------
+<form #userForm="ngForm">
+  <table border=1>
+    <thead>
+      <tr>
+        <th>BetId</th>
+        <th>PlayerId</th>
+        <th>EventId</th>
+        <th colspan="2"></th>
+      </tr>
+      <tr>
+        <th>
+          <input name="BetId" [(ngModel)]="BetId" placeholder="BetId" />
+        </th>
+        <th>
+          <input name="PlayerId" [(ngModel)]="PlayerId" placeholder="PlayerId" />
+        </th>
+        <th>
+          <input name="EventId" [(ngModel)]="EventId" placeholder="Address" />
+        </th>
+        <th colspan="2">
+          <button (click)="postUserDetails(userForm.value)" *ngIf="showSave"> Save </button>
+          <button type="submit" *ngIf="showUpdate"> Update </button>
+          <button (click)="CancelEdit()" *ngIf="showUpdate"> Cancel </button>
+        </th>
+
+      </tr>
+    </thead>
+    {{JSON.stringify(UserDetails)}}
+    <tr *ngFor="let bet1 of UserDetails">
+      <td> {{bet1.BetId}}</td>
+      <td> {{bet1.PlayerId}}</td>
+      <td> {{bet1.EventId}}</td>
+      <td>
+        <button (click)="EditUser(bet1)">Edit</button>
+      </td>
+      <td>
+        <button (click)="DeleteUserDetails(bet1.BetId)">Remove</button>
+      </td>
+    </tr>
+  </table>
+</form>
+------------------------------router-------------
+import { ModuleWithProviders } from '@angular/core'
+import { Routes, RouterModule } from '@angular/router';
+
+import { DisplayUserComponent } from '../Component/user/display-user/display-user.component'
+import { ModifyUserComponent } from '../Component/user/modify-user/modify-user.component';
+
+const appRoutes: Routes = [
+  {
+    path: '',
+    component: DisplayUserComponent
+  },
+  {
+    path: 'about',
+    component: ModifyUserComponent
+  }
+];
+
+export const routing: ModuleWithProviders = RouterModule.forRoot(appRoutes); // To export the Routing variable
+-----------App module
+
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+
+
+import { AppComponent } from './app.component';
+import { BetComponent } from './Component/bet/bet.component';
+
+import { FormsModule } from '@angular/forms'; // to use ngModel
+import { HttpModule } from '@angular/http'; // to use Services
+
+import { BetServiceService } from './Component/bet/Shared/bet-service.service';
+import { routing  } from './Shared/app-routing.module';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    BetComponent
+  ],
+  imports: [
+    BrowserModule, FormsModule, HttpModule ,routing
+  ],
+  providers: [BetServiceService],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
